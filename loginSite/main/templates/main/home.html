@@ -1,0 +1,40 @@
+{% extends 'main/base.html' %}
+{% block title %}Main Page{% endblock %}
+{% block content %} 
+
+<div class="card mt-2">
+{% if not posts %} 
+    <h1> There are no posts yet.</h1>
+    <h2><a href="{% url 'new_post' %}">Create one</a></h2>
+{% else %}
+    {% for post in posts %} 
+        <div class="card-header bg-dark text-light"><strong>@{{ post.author }}</strong></div>
+        <div class="card-body bg-light text-dark d-flex flex-row justify-content-between">
+            <div>
+                <h4 class="card-title">{{ post.title }}</h4>
+                <p>{{ post.text }}</p>
+            </div>
+            <div>
+                {% if user == post.author or perms.user.delete_post %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-danger" name="post-id" value="{{ post.id }}">Delete</button>
+                    </form>
+                {% endif %}
+                {% if user.is_staff %}
+                    <form method="post">
+                        {% csrf_token %}
+                        <button class="btn btn-warning" name="author-id" value="{{ post.author.id }}">Ban</button>
+                    </form>
+                {% endif %}
+            </div>
+        </div>
+        <div class="card-footer text-muted">
+            <p>{{ post.created }}</p>
+        </div>
+
+    {% endfor %}
+{% endif %}
+</div>
+
+{% endblock %}
